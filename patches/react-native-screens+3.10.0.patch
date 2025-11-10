@@ -1,0 +1,24 @@
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt
+index 1234567..abcdefg 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt
+@@ -319,7 +319,7 @@ class ScreenStack(context: Context?) : ScreenContainer(context) {
+     }
+ 
+     override fun dispatchDraw(canvas: Canvas?) {
+-        super.dispatchDraw(canvas)
++        canvas?.let { super.dispatchDraw(it) }
+         if (mDrawingOp != null) {
+             mDrawingOp!!.draw(canvas)
+         }
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomSearchView.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomSearchView.kt
+index 1234567..abcdefg 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomSearchView.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomSearchView.kt
+@@ -5,7 +5,7 @@ import android.widget.SearchView
+ import androidx.appcompat.widget.SearchView as AppCompatSearchView
+ 
+ class CustomSearchView(context: Context) : AppCompatSearchView(context) {
+-    constructor(context: Context?) : this(context)
++    constructor(context: Context?) : this(context!!)
+ }
