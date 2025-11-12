@@ -117,7 +117,7 @@ AI Financial Assistant (Invoxen) is a comprehensive financial management applica
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ai-financial-assistant.git
+git clone https://github.com/kunal-gh/ai-financial-assistant.git
 cd ai-financial-assistant
 
 # Install dependencies
