@@ -1,15 +1,15 @@
-# 💰 AI Financial Assistant (Invoxen)
+# 💰 Invoxen - AI Financial Assistant
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![React Native](https://img.shields.io/badge/React%20Native-0.72.17-61dafb.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
-**A modern, AI-powered financial management app for Android**
+**A modern, AI-powered financial management app for Android with professional invoice sharing**
 
-[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [Usage](#-usage) • [Development](#-development)
+[Features](#-features) • [Installation](#-installation) • [Build Guide](#-building-from-source) • [Usage](#-usage) • [Development](#-development)
 
 </div>
 
@@ -17,15 +17,16 @@
 
 ## 📱 About
 
-AI Financial Assistant (Invoxen) is a comprehensive financial management application built with React Native. It helps you manage clients, invoices, expenses, and provides an intelligent AI assistant with voice control for hands-free operation.
+**Invoxen** is a comprehensive financial management application built with React Native. It helps you manage clients, invoices, expenses, and provides an intelligent AI assistant with voice control for hands-free operation. Now with professional invoice sharing capabilities!
 
 ### ✨ Key Highlights
 
 - 🤖 **AI-Powered Automation** - Natural language processing for task automation
 - 🎤 **Voice Control** - Hands-free operation with voice commands
-- 📊 **Visual Analytics** - Beautiful charts and graphs for financial insights
+- 📊 **Visual Analytics** - Beautiful charts and graphs with Rupee (₹) currency
 - 💾 **Local Database** - SQLite for fast, offline-first data storage
-- 🎨 **Modern UI** - Dark Material Design 3 theme
+- 📄 **Professional Invoice Sharing** - Share formatted invoices via any app
+- 🎨 **Modern UI** - Dark Material Design 3 theme with Invoxen branding
 - 🚀 **Fast & Responsive** - Optimized performance
 
 ---
@@ -48,9 +49,11 @@ AI Financial Assistant (Invoxen) is a comprehensive financial management applica
 ### 📄 Invoice Management
 - Create detailed invoices with multiple line items
 - Track invoice status (Paid, Pending, Overdue)
-- Professional invoice layout
-- Share invoices via email/messaging
+- Professional invoice layout with company branding
+- **Share invoices** as beautifully formatted text via WhatsApp, Email, SMS, etc.
 - Automatic calculations (subtotal, tax, total)
+- Support for notes and payment terms
+- Rupee (₹) currency formatting
 
 ### 💳 Expense Tracking
 - Categorized expense management
@@ -98,46 +101,241 @@ AI Financial Assistant (Invoxen) is a comprehensive financial management applica
 
 ### Option 1: Download APK (Recommended for Users)
 
-1. Download the latest APK from [Releases](../../releases)
+1. Download the latest `app-release.apk` from the repository root or [Releases](../../releases)
 2. Transfer to your Android device
-3. Enable "Install from Unknown Sources" in Settings
-4. Install the APK
-5. Grant microphone permission for voice features
+3. Enable "Install from Unknown Sources" in Settings → Security
+4. Tap the APK file to install
+5. Grant microphone permission for voice features when prompted
 
-### Option 2: Build from Source (For Developers)
+---
 
-#### Prerequisites
-- Node.js (v14 or higher)
-- React Native CLI
-- Android Studio
-- JDK 11
-- Android SDK (API 34)
+## 🔨 Building from Source
 
-#### Steps
+### Prerequisites
+
+Before building, ensure you have the following installed:
+
+#### Required Software
+
+1. **Node.js** (v16 or higher)
+   - Download from: https://nodejs.org/
+   - Verify: `node --version`
+
+2. **Java Development Kit (JDK 11)**
+   - Download from: https://adoptium.net/
+   - Verify: `java -version`
+   - Set `JAVA_HOME` environment variable
+
+3. **Android Studio**
+   - Download from: https://developer.android.com/studio
+   - Install Android SDK (API Level 34)
+   - Install Android SDK Build-Tools
+   - Install Android Emulator (optional, for testing)
+
+4. **Android SDK Setup**
+   - Open Android Studio → SDK Manager
+   - Install:
+     - Android SDK Platform 34
+     - Android SDK Build-Tools 34.0.0
+     - Android SDK Platform-Tools
+     - Android Emulator (optional)
+   
+5. **Environment Variables** (Windows)
+   ```
+   ANDROID_HOME = C:\Users\YourUsername\AppData\Local\Android\Sdk
+   Add to PATH: %ANDROID_HOME%\platform-tools
+   Add to PATH: %ANDROID_HOME%\tools
+   ```
+
+### Step-by-Step Build Instructions
+
+#### 1. Clone the Repository
 
 ```bash
-# Clone the repository
 git clone https://github.com/kunal-gh/ai-financial-assistant.git
 cd ai-financial-assistant
-
-# Install dependencies
-npm install
-
-# Start Metro bundler
-npm start
-
-# Build and run on Android
-npm run android
 ```
 
-#### Build Release APK
+#### 2. Install Dependencies
 
 ```bash
+npm install
+```
+
+This will install all required Node.js packages including:
+- React Native
+- SQLite storage
+- Voice recognition
+- File system utilities
+- Share functionality
+
+#### 3. Configure Android SDK Path
+
+The build process needs to know where your Android SDK is located.
+
+**Windows:**
+```bash
 cd android
+echo sdk.dir=C:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk > local.properties
+```
+
+**Mac/Linux:**
+```bash
+cd android
+echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties
+```
+
+#### 4. Build Release APK
+
+**Windows:**
+```bash
+cd android
+.\gradlew.bat clean
+.\gradlew.bat assembleRelease
+```
+
+**Mac/Linux:**
+```bash
+cd android
+./gradlew clean
 ./gradlew assembleRelease
 ```
 
-APK will be at: `android/app/build/outputs/apk/release/app-release.apk`
+The build process will:
+- Clean previous builds
+- Compile TypeScript/JavaScript code
+- Bundle assets
+- Compile native Android code
+- Create the APK
+
+**Build time:** 2-5 minutes (first build may take longer)
+
+#### 5. Locate the APK
+
+After successful build, find your APK at:
+```
+android/app/build/outputs/apk/release/app-release.apk
+```
+
+You can also copy it to the project root:
+```bash
+# Windows
+copy android\app\build\outputs\apk\release\app-release.apk .\app-release.apk
+
+# Mac/Linux
+cp android/app/build/outputs/apk/release/app-release.apk ./app-release.apk
+```
+
+### Running on Emulator
+
+#### 1. Start Android Emulator
+
+**From Android Studio:**
+- Open AVD Manager (Tools → Device Manager)
+- Click ▶️ on any emulator
+
+**From Command Line (Windows):**
+```bash
+%LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd YOUR_AVD_NAME -no-snapshot-load
+```
+
+#### 2. Verify Emulator is Running
+
+```bash
+adb devices
+```
+
+You should see:
+```
+List of devices attached
+emulator-5554   device
+```
+
+#### 3. Install APK on Emulator
+
+```bash
+adb install -r app-release.apk
+```
+
+#### 4. Launch the App
+
+```bash
+adb shell am start -n com.aifinancialassistant/.MainActivity
+```
+
+### Development Mode (Hot Reload)
+
+For development with hot reload:
+
+```bash
+# Terminal 1: Start Metro bundler
+npm start
+
+# Terminal 2: Run on Android
+npm run android
+```
+
+This will:
+- Start the Metro bundler for hot reloading
+- Build and install the debug APK
+- Launch the app on connected device/emulator
+
+### Troubleshooting Build Issues
+
+#### Issue: "SDK location not found"
+**Solution:** Create `android/local.properties` with your SDK path:
+```
+sdk.dir=C:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk
+```
+
+#### Issue: "Gradle build failed"
+**Solution:** Clean and rebuild:
+```bash
+cd android
+.\gradlew.bat clean
+.\gradlew.bat assembleRelease --no-daemon
+```
+
+#### Issue: "Command not found: gradlew"
+**Solution:** Make sure you're in the `android` directory:
+```bash
+cd android
+```
+
+#### Issue: "Java version mismatch"
+**Solution:** Ensure JDK 11 is installed and `JAVA_HOME` is set correctly:
+```bash
+java -version  # Should show version 11.x.x
+```
+
+#### Issue: "Out of memory"
+**Solution:** Increase Gradle memory in `android/gradle.properties`:
+```
+org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=512m
+```
+
+#### Issue: "Node modules not found"
+**Solution:** Reinstall dependencies:
+```bash
+rm -rf node_modules
+npm install
+```
+
+### Build Variants
+
+**Debug APK** (for development):
+```bash
+cd android
+.\gradlew.bat assembleDebug
+```
+Output: `android/app/build/outputs/apk/debug/app-debug.apk`
+
+**Release APK** (for distribution):
+```bash
+cd android
+.\gradlew.bat assembleRelease
+```
+Output: `android/app/build/outputs/apk/release/app-release.apk`
 
 ---
 
@@ -145,12 +343,13 @@ APK will be at: `android/app/build/outputs/apk/release/app-release.apk`
 
 ### Getting Started
 
-1. **Launch the app** - See the "Created by SW" splash screen
-2. **Explore Dashboard** - View your financial overview
+1. **Launch the app** - See the "Invoxen" splash screen
+2. **Explore Dashboard** - View your Invoxen Dashboard with financial overview
 3. **Add Clients** - Tap Clients tab → ➕ button
-4. **Create Invoices** - Tap Invoices tab → ➕ button
-5. **Track Expenses** - Tap Expenses tab → ➕ button
-6. **Use AI Assistant** - Tap AI Assistant tab → Speak or type commands
+4. **Create Invoices** - Tap Invoices tab → ➕ button → Add line items
+5. **Share Invoices** - Open any invoice → Tap "Share Invoice" → Choose app (WhatsApp, Email, etc.)
+6. **Track Expenses** - Tap Expenses tab → ➕ button
+7. **Use AI Assistant** - Tap AI Assistant tab → Speak or type commands
 
 ### Voice Commands
 
@@ -205,9 +404,9 @@ Invoxen/
   "react-native": "0.72.17",
   "react-native-sqlite-storage": "^6.0.1",
   "@react-native-voice/voice": "^3.2.4",
-  "react-native-vector-icons": "^10.0.3",
-  "@react-navigation/native": "^6.1.9",
-  "@react-navigation/bottom-tabs": "^6.5.11"
+  "react-native-vector-icons": "^10.0.0",
+  "react-native-fs": "^2.20.0",
+  "react-native-share": "^10.0.0"
 }
 ```
 
@@ -293,7 +492,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Created by SW**
+**Invoxen** - Professional Financial Management
+
+Created by: [@kunal-gh](https://github.com/kunal-gh)
 
 ---
 
@@ -315,8 +516,11 @@ For issues, questions, or suggestions:
 
 ## 🚀 Roadmap
 
-- [ ] Cloud sync
+- [x] Professional invoice sharing
+- [x] Rupee (₹) currency support
+- [x] Invoxen branding
 - [ ] PDF invoice generation
+- [ ] Cloud sync
 - [ ] Multi-currency support
 - [ ] Recurring invoices
 - [ ] Payment reminders
