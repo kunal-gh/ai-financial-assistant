@@ -37,7 +37,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({onNavigate}) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Financial Dashboard</Text>
+        <Text style={styles.title}>Invoxen Dashboard</Text>
         <Text style={styles.subtitle}>Welcome back!</Text>
       </View>
 

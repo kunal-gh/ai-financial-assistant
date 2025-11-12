@@ -45,7 +45,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({onFinish}) => {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.content, {opacity: fadeAnim}]}>
-        <Text style={styles.title}>Created by SW</Text>
+        <Text style={styles.title}>Invoxen</Text>
         <Text style={styles.dots}>{dots}</Text>
       </Animated.View>
     </View>

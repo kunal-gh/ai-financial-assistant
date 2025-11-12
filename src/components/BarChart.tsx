@@ -17,7 +17,7 @@ const BarChart: React.FC<BarChartProps> = ({data, height = 200}) => {
           return (
             <View key={index} style={styles.barWrapper}>
               <View style={styles.barContainer}>
-                <Text style={styles.valueText}>${item.value}</Text>
+                <Text style={styles.valueText}>₹{item.value}</Text>
                 <View
                   style={[
                     styles.bar,

@@ -10,6 +10,7 @@ import {
   ScrollView,
   Share,
   Alert,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DatabaseService, LineItem} from '../services/DatabaseService';
@@ -144,44 +145,363 @@ const InvoicesScreen = () => {
     const tax = selectedInvoice.tax_rate ? subtotal * (selectedInvoice.tax_rate / 100) : 0;
     const total = subtotal + tax;
 
-    let message = `INVOICE #{selectedInvoice.id}\n\n`;
-    message += `Bill To: {selectedInvoice.client_name}\n`;
-    message += `Date: {selectedInvoice.date_created}\n`;
-    message += `Due Date: {selectedInvoice.due_date}\n`;
-    message += `Status: {selectedInvoice.status.toUpperCase()}\n\n`;
-    message += `LINE ITEMS:\n`;
-    message += `{'='.repeat(50)}\n`;
-
+    // Generate line items HTML
+    let lineItemsHTML = '';
     if (selectedInvoice.line_items) {
       selectedInvoice.line_items.forEach((item: LineItem, index: number) => {
-        message += `{index + 1}. {item.description}\n`;
-        message += `   Qty: {item.quantity} x ₹{item.rate.toFixed(2)} = ₹{item.amount.toFixed(2)}\n\n`;
+        lineItemsHTML += `
+          <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">${item.description}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">${item.quantity}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;">₹${item.rate.toFixed(2)}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: bold;">₹${item.amount.toFixed(2)}</td>
+          </tr>
+        `;
       });
     } else {
-      message += `1. {selectedInvoice.description}\n`;
-      message += `   Amount: ₹{selectedInvoice.amount.toFixed(2)}\n\n`;
+      lineItemsHTML = `
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">${selectedInvoice.description}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">1</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;">₹${selectedInvoice.amount.toFixed(2)}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: bold;">₹${selectedInvoice.amount.toFixed(2)}</td>
+        </tr>
+      `;
     }
 
-    message += `{'='.repeat(50)}\n`;
-    message += `Subtotal: ₹{subtotal.toFixed(2)}\n`;
-    if (tax > 0) {
-      message += `Tax ({selectedInvoice.tax_rate}%): ₹{tax.toFixed(2)}\n`;
-    }
-    message += `TOTAL: ₹{total.toFixed(2)}\n\n`;
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+          }
+          .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #6200ee;
+          }
+          .company-info {
+            flex: 1;
+          }
+          .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+          }
+          .company-details {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+          }
+          .invoice-title-section {
+            text-align: right;
+          }
+          .invoice-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #6200ee;
+            margin: 0;
+          }
+          .invoice-number {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+          }
+          .bill-to {
+            margin-bottom: 30px;
+          }
+          .bill-to-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+          }
+          .bill-to-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+          }
+          .invoice-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+          }
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+          }
+          .info-label {
+            font-size: 14px;
+            color: #666;
+          }
+          .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+          }
+          .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            background: #3d5a80;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+          }
+          thead {
+            background: #6200ee;
+            color: white;
+          }
+          th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+          th:nth-child(2), th:nth-child(3), th:nth-child(4) {
+            text-align: right;
+          }
+          td {
+            font-size: 13px;
+          }
+          .totals {
+            text-align: right;
+            margin-bottom: 30px;
+          }
+          .total-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+          }
+          .total-label {
+            width: 150px;
+            font-size: 14px;
+            color: #666;
+            text-align: right;
+            margin-right: 20px;
+          }
+          .total-value {
+            width: 120px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-align: right;
+          }
+          .grand-total {
+            border-top: 2px solid #333;
+            padding-top: 12px;
+            margin-top: 12px;
+          }
+          .grand-total .total-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+          }
+          .grand-total .total-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6200ee;
+          }
+          .notes {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+          }
+          .notes-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+          }
+          .notes-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+          }
+          .footer {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-container">
+          <div class="header">
+            <div class="company-info">
+              <div class="company-name">Your Company</div>
+              <div class="company-details">
+                123 Business Street<br>
+                City, State 12345<br>
+                Phone: (123) 456-7890<br>
+                Email: info@yourcompany.com
+              </div>
+            </div>
+            <div class="invoice-title-section">
+              <h1 class="invoice-title">INVOICE</h1>
+              <div class="invoice-number">#${selectedInvoice.id}</div>
+            </div>
+          </div>
 
-    if (selectedInvoice.notes) {
-      message += `Notes: {selectedInvoice.notes}\n\n`;
-    }
+          <div class="bill-to">
+            <div class="bill-to-label">Bill To:</div>
+            <div class="bill-to-name">${selectedInvoice.client_name}</div>
+          </div>
 
-    message += `Thank you for your business!`;
+          <div class="invoice-info">
+            <div class="info-row">
+              <span class="info-label">Invoice Date:</span>
+              <span class="info-value">${selectedInvoice.date_created}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Due Date:</span>
+              <span class="info-value">${selectedInvoice.due_date}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status:</span>
+              <span class="status-badge">${selectedInvoice.status.toUpperCase()}</span>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th style="text-align: center;">Quantity</th>
+                <th style="text-align: right;">Rate</th>
+                <th style="text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${lineItemsHTML}
+            </tbody>
+          </table>
+
+          <div class="totals">
+            <div class="total-row">
+              <div class="total-label">Subtotal:</div>
+              <div class="total-value">₹${subtotal.toFixed(2)}</div>
+            </div>
+            ${tax > 0 ? `
+            <div class="total-row">
+              <div class="total-label">Tax (${selectedInvoice.tax_rate}%):</div>
+              <div class="total-value">₹${tax.toFixed(2)}</div>
+            </div>
+            ` : ''}
+            <div class="total-row grand-total">
+              <div class="total-label">TOTAL:</div>
+              <div class="total-value">₹${total.toFixed(2)}</div>
+            </div>
+          </div>
+
+          ${selectedInvoice.notes ? `
+          <div class="notes">
+            <div class="notes-label">Notes:</div>
+            <div class="notes-text">${selectedInvoice.notes}</div>
+          </div>
+          ` : ''}
+
+          <div class="footer">
+            <p>Thank you for your business!</p>
+            <p style="font-size: 12px; color: #999; margin-top: 10px;">
+              This is a computer-generated invoice. No signature required.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
     try {
+      // Create a nicely formatted text invoice
+      let textInvoice = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      textInvoice += `           INVOICE #${selectedInvoice.id}\n`;
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      textInvoice += `FROM:\n`;
+      textInvoice += `Your Company\n`;
+      textInvoice += `123 Business Street\n`;
+      textInvoice += `City, State 12345\n\n`;
+      
+      textInvoice += `BILL TO:\n`;
+      textInvoice += `${selectedInvoice.client_name}\n\n`;
+      
+      textInvoice += `Invoice Date: ${selectedInvoice.date_created}\n`;
+      textInvoice += `Due Date: ${selectedInvoice.due_date}\n`;
+      textInvoice += `Status: ${selectedInvoice.status.toUpperCase()}\n\n`;
+      
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      textInvoice += `ITEMS:\n`;
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      if (selectedInvoice.line_items) {
+        selectedInvoice.line_items.forEach((item: LineItem, index: number) => {
+          textInvoice += `${index + 1}. ${item.description}\n`;
+          textInvoice += `   Qty: ${item.quantity} × ₹${item.rate.toFixed(2)} = ₹${item.amount.toFixed(2)}\n\n`;
+        });
+      } else {
+        textInvoice += `1. ${selectedInvoice.description}\n`;
+        textInvoice += `   Amount: ₹${selectedInvoice.amount.toFixed(2)}\n\n`;
+      }
+      
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      textInvoice += `Subtotal:        ₹${subtotal.toFixed(2)}\n`;
+      
+      if (tax > 0) {
+        textInvoice += `Tax (${selectedInvoice.tax_rate}%):       ₹${tax.toFixed(2)}\n`;
+      }
+      
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      textInvoice += `TOTAL:           ₹${total.toFixed(2)}\n`;
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      if (selectedInvoice.notes) {
+        textInvoice += `Notes:\n${selectedInvoice.notes}\n\n`;
+      }
+      
+      textInvoice += `Thank you for your business!\n`;
+      textInvoice += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+
+      // Use React Native's built-in Share API
       await Share.share({
-        message: message,
-        title: `Invoice #{selectedInvoice.id}`,
+        message: textInvoice,
+        title: `Invoice #${selectedInvoice.id} - ${selectedInvoice.client_name}`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sharing invoice:', error);
+      if (error.message !== 'User did not share') {
+        Alert.alert(
+          'Error', 
+          `Failed to share invoice. ${error.message || 'Please try again.'}`
+        );
+      }
     }
   };
 
